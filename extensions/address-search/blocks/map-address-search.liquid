@@ -1,0 +1,345 @@
+<script>
+	if (screen.width < 992) {
+		// for small screens, load the mobile css
+		let link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = 'https://searchanise-ef84.kxcdn.com/results_big_pictures_new.mobile.08918.css';
+
+		// Get HTML head element to append link element to it
+		document.getElementsByTagName('HEAD')[0].appendChild(link);
+	}
+</script>
+
+<script src="{{ 'address-search-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'turf.min.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'perform-search.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'on-page-load.js' | asset_url }}" defer="defer"></script>
+
+<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+    <symbol id="icon-search" viewbox="0 0 18 19" fill="none">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M11.03 11.68A5.784 5.784 0 112.85 3.5a5.784 5.784 0 018.18 8.18zm.26 1.12a6.78 6.78 0 11.72-.7l5.4 5.4a.5.5 0 11-.71.7l-5.41-5.4z"
+              fill="currentColor"/>
+    </symbol>
+
+    <symbol id="icon-reset" class="icon icon-close" fill="none" viewBox="0 0 18 18"
+            stroke="currentColor">
+        <circle r="8.5" cy="9" cx="9" stroke-opacity="0.2"/>
+        <path d="M6.82972 6.82915L1.17193 1.17097" stroke-linecap="round" stroke-linejoin="round"
+              transform="translate(5 5)"/>
+        <path d="M1.22896 6.88502L6.77288 1.11523" stroke-linecap="round" stroke-linejoin="round"
+              transform="translate(5 5)"/>
+    </symbol>
+
+    <symbol id="icon-close" class="icon icon-close" fill="none" viewBox="0 0 18 17">
+        <path d="M.865 15.978a.5.5 0 00.707.707l7.433-7.431 7.579 7.282a.501.501 0 00.846-.37.5.5 0 00-.153-.351L9.712 8.546l7.417-7.416a.5.5 0 10-.707-.708L8.991 7.853 1.413.573a.5.5 0 10-.693.72l7.563 7.268-7.418 7.417z"
+              fill="currentColor"/>
+    </symbol>
+</svg>
+
+<script>
+	(g => {
+		let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary",
+				q = "__ib__", m = document, b = window;
+		b = b[c] || (b[c] = {});
+		const d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+				u = () => h || (h = new Promise(async (f, n) => {
+					await (a = m.createElement("script"));
+					e.set("libraries", [...r] + "");
+					for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+					e.set("callback", c + ".maps." + q);
+					a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+					d[q] = f;
+					a.onerror = () => h = n(Error(p + " could not load."));
+					a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+					m.head.append(a)
+				}));
+		d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+	})({
+		key: "AIzaSyCIWmSnAXVG4i7bgSnrT8ToScJltp4ar5w",
+		v: "weekly",
+		// Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+		// Add other bootstrap parameters as needed, using camel case.
+	});
+</script>
+<script src="{{ 'init-autocomplete.js' | asset_url }}" async></script>
+
+<div class="template-search section-{{ block.id }}-padding" id="main-div">
+    <div class="template-search__header page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+        <div class="template-search__search">
+            <address-search-form>
+                <form role="search" class="search" id="search-form">
+                    <div class="field" id="hiddenDiv" style="display: none"></div>
+                    <div class="field" id="addressFieldDiv">
+                        <input
+                                class="search__input field__input"
+                                id="addressField"
+                                type="search"
+                                name="address"
+                                value=""
+                                placeholder="{{ 'address-search.form.placeholder' | t }}"
+                        >
+                        <label class="field__label"
+                               for="addressField">{{ 'address-search.form.address_label' | t }}</label>
+
+                        <input type="hidden" name="locality" id="locality" value="">
+                        <input type="hidden" name="state" id="state" value="">
+                        <input type="hidden" name="lat" id="lat" value="">
+                        <input type="hidden" name="lon" id="lon" value="">
+
+                        <span class="Polaris-Spinner Polaris-Spinner--sizeLarge loading_indicator hidden" id="spinner">
+							<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+								<path d="M15.542 1.487A21.507 21.507 0 00.5 22c0 11.874 9.626 21.5 21.5 21.5 9.847 0 18.364-6.675 20.809-16.072a1.5 1.5 0 00-2.904-.756C37.803 34.755 30.473 40.5 22 40.5 11.783 40.5 3.5 32.217 3.5 22c0-8.137 5.3-15.247 12.942-17.65a1.5 1.5 0 10-.9-2.863z">
+								</path>
+							</svg>
+						</span>
+
+                        <button
+                                type="reset"
+                                class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"
+                                aria-label="{{ 'general.search.reset' | t }}"
+                        >
+                            <svg class="icon icon-close" aria-hidden="true" focusable="false">
+                                <use xlink:href="#icon-reset"/>
+                            </svg>
+                        </button>
+                        <button type="submit" class="search__button field__button"
+                                aria-label="{{ 'general.search.search' | t }}">
+                            <svg class="icon icon-search" aria-hidden="true" focusable="false">
+                                <use xlink:href="#icon-search"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </address-search-form>
+        </div>
+    </div>
+    <div class="page-content" id="page-content-div" style="padding-bottom: 0; display: none">
+        <div class="snize-search-results-main-content" id="snize-search-results-main-content">
+            <header class="section-header" id="search-results-header">
+                <h1 class="section-header__title" id="search-results-header-text"
+                    style="display: none;">
+                    Your Search Results
+                </h1>
+            </header>
+            <div id="snize-search-results-grid-mode">
+                <ul class="snize-search-results-content clearfix" id="search-results-ul">
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% schema %}
+{
+	"name": "Map Address Search",
+	"target": "section",
+	"stylesheet": "map-address-search.css",
+	"settings": [
+		{
+			"type": "range",
+			"id": "columns_desktop",
+			"min": 1,
+			"max": 5,
+			"step": 1,
+			"default": 4,
+			"label": "t:sections.main-search.settings.columns_desktop.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.main-search.settings.header_mobile.content"
+		},
+		{
+			"type": "select",
+			"id": "columns_mobile",
+			"default": "2",
+			"label": "t:sections.main-search.settings.columns_mobile.label",
+			"options": [
+				{
+					"value": "1",
+					"label": "t:sections.main-search.settings.columns_mobile.options__1.label"
+				},
+				{
+					"value": "2",
+					"label": "t:sections.main-search.settings.columns_mobile.options__2.label"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.padding.section_padding_heading"
+		},
+		{
+			"type": "range",
+			"id": "padding_top",
+			"min": 0,
+			"max": 100,
+			"step": 4,
+			"unit": "px",
+			"label": "t:sections.all.padding.padding_top",
+			"default": 36
+		},
+		{
+			"type": "range",
+			"id": "padding_bottom",
+			"min": 0,
+			"max": 100,
+			"step": 4,
+			"unit": "px",
+			"label": "t:sections.all.padding.padding_bottom",
+			"default": 36
+		}
+	]
+}
+{% endschema %}
+
+{% comment %}
+{%- liquid
+    assign sort_by = search.sort_by | default: search.default_sort_by
+    assign terms = search.terms | escape
+    assign search_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+-%}
+{% endcomment %}
+
+{% comment %}
+		{
+			"type": "header",
+			"content": "t:sections.main-search.settings.header__1.content"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{
+					"value": "adapt",
+					"label": "t:sections.main-search.settings.image_ratio.options__1.label"
+				},
+				{
+					"value": "portrait",
+					"label": "t:sections.main-search.settings.image_ratio.options__2.label"
+				},
+				{
+					"value": "square",
+					"label": "t:sections.main-search.settings.image_ratio.options__3.label"
+				}
+			],
+			"default": "adapt",
+			"label": "t:sections.main-search.settings.image_ratio.label"
+		},
+		{
+			"type": "select",
+			"id": "image_shape",
+			"options": [
+				{
+					"value": "default",
+					"label": "t:sections.all.image_shape.options__1.label"
+				},
+				{
+					"value": "arch",
+					"label": "t:sections.all.image_shape.options__2.label"
+				},
+				{
+					"value": "blob",
+					"label": "t:sections.all.image_shape.options__3.label"
+				},
+				{
+					"value": "chevronleft",
+					"label": "t:sections.all.image_shape.options__4.label"
+				},
+				{
+					"value": "chevronright",
+					"label": "t:sections.all.image_shape.options__5.label"
+				},
+				{
+					"value": "diamond",
+					"label": "t:sections.all.image_shape.options__6.label"
+				},
+				{
+					"value": "parallelogram",
+					"label": "t:sections.all.image_shape.options__7.label"
+				},
+				{
+					"value": "round",
+					"label": "t:sections.all.image_shape.options__8.label"
+				}
+			],
+			"default": "default",
+			"label": "t:sections.all.image_shape.label",
+			"info": "t:sections.all.image_shape.info"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_secondary_image",
+			"default": false,
+			"label": "t:sections.main-search.settings.show_secondary_image.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_vendor",
+			"default": false,
+			"label": "t:sections.main-search.settings.show_vendor.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_rating",
+			"default": false,
+			"label": "t:sections.main-search.settings.show_rating.label",
+			"info": "t:sections.main-search.settings.show_rating.info"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.main-collection-product-grid.settings.header__1.content"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_filtering",
+			"default": true,
+			"label": "t:sections.main-collection-product-grid.settings.enable_filtering.label",
+			"info": "t:sections.main-collection-product-grid.settings.enable_filtering.info"
+		},
+		{
+			"type": "select",
+			"id": "filter_type",
+			"options": [
+				{
+					"value": "horizontal",
+					"label": "t:sections.main-collection-product-grid.settings.filter_type.options__1.label"
+				},
+				{
+					"value": "vertical",
+					"label": "t:sections.main-collection-product-grid.settings.filter_type.options__2.label"
+				},
+				{
+					"value": "drawer",
+					"label": "t:sections.main-collection-product-grid.settings.filter_type.options__3.label"
+				}
+			],
+			"default": "horizontal",
+			"label": "t:sections.main-collection-product-grid.settings.filter_type.label",
+			"info": "t:sections.main-collection-product-grid.settings.filter_type.info"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_sorting",
+			"default": true,
+			"label": "t:sections.main-collection-product-grid.settings.enable_sorting.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.main-search.settings.header__2.content",
+			"info": "t:sections.main-search.settings.header__2.info"
+		},
+		{
+			"type": "checkbox",
+			"id": "article_show_date",
+			"default": true,
+			"label": "t:sections.main-search.settings.article_show_date.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "article_show_author",
+			"default": false,
+			"label": "t:sections.main-search.settings.article_show_author.label"
+		},
+{% endcomment %}
