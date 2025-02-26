@@ -10,10 +10,12 @@
     "generate": "shopify app generate",
     "deploy": "shopify app deploy"
   },
-  "dependencies": {},
   "trustedDependencies": [
     "@shopify/plugin-cloudflare"
   ],
   "author": "kmiller",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.5.2"
+  }
 }
