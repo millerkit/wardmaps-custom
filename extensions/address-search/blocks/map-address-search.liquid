@@ -41,9 +41,6 @@
 <!-- prettier-ignore -->
 <!-- See https://github.com/googlemaps/extended-component-library for docs and updates. -->
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/@googlemaps/extended-component-library/0.6.11/index.min.js"></script>
-{% comment %}<script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))}){% endcomment %}
-	{% comment %}({key: "AIzaSyDV6nh-_iS6xeI6dvkEqD7OJ6Fztt5tkGI", v: "beta"});{% endcomment %}
-{% comment %}</script>{% endcomment %}
 <script src="{{ 'handle-place-change.js' | asset_url }}" async></script>
 <script src="{{ 'check-for-address-in-url.js' | asset_url }}" async></script>
 <script src="{{ 'init-autocomplete.js' | asset_url }}" async></script>
@@ -59,14 +56,6 @@
 						<div class="field placePickerContainer" id="placePickerContainer">
 							<gmpx-place-picker placeholder="{{ 'address-search.form.address_label' | t }}"></gmpx-place-picker>
 						</div>
-						{% comment %}<input{% endcomment %}
-								{% comment %}class="search__input field__input"{% endcomment %}
-								{% comment %}id="addressField"{% endcomment %}
-								{% comment %}type="search"{% endcomment %}
-								{% comment %}name="address"{% endcomment %}
-						{% comment %}>{% endcomment %}
-                        {% comment %}<label class="field__label"{% endcomment %}
-                               {% comment %}for="addressField">{{ 'address-search.form.address_label' | t }}</label>{% endcomment %}
 
                         <input type="hidden" name="locality" id="locality" value="">
                         <input type="hidden" name="state" id="state" value="">
@@ -79,22 +68,6 @@
 								</path>
 							</svg>
 						</span>
-
-                        {% comment %}<button{% endcomment %}
-                                {% comment %}type="reset"{% endcomment %}
-                                {% comment %}class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"{% endcomment %}
-                                {% comment %}aria-label="{{ 'general.search.reset' | t }}"{% endcomment %}
-                        {% comment %}>{% endcomment %}
-                            {% comment %}<svg class="icon icon-close" aria-hidden="true" focusable="false">{% endcomment %}
-                                {% comment %}<use xlink:href="#icon-reset"/>{% endcomment %}
-                            {% comment %}</svg>{% endcomment %}
-                        {% comment %}</button>{% endcomment %}
-                        {% comment %}<button type="submit" class="search__button field__button"{% endcomment %}
-                                {% comment %}aria-label="{{ 'general.search.search' | t }}">{% endcomment %}
-                            {% comment %}<svg class="icon icon-search" aria-hidden="true" focusable="false">{% endcomment %}
-                                {% comment %}<use xlink:href="#icon-search"/>{% endcomment %}
-                            {% comment %}</svg>{% endcomment %}
-                        {% comment %}</button>{% endcomment %}
                     </div>
                 </form>
             </address-search-form>
@@ -178,153 +151,3 @@
 	]
 }
 {% endschema %}
-
-{% comment %}
-{%- liquid
-    assign sort_by = search.sort_by | default: search.default_sort_by
-    assign terms = search.terms | escape
-    assign search_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
--%}
-{% endcomment %}
-
-{% comment %}
-		{
-			"type": "header",
-			"content": "t:sections.main-search.settings.header__1.content"
-		},
-		{
-			"type": "select",
-			"id": "image_ratio",
-			"options": [
-				{
-					"value": "adapt",
-					"label": "t:sections.main-search.settings.image_ratio.options__1.label"
-				},
-				{
-					"value": "portrait",
-					"label": "t:sections.main-search.settings.image_ratio.options__2.label"
-				},
-				{
-					"value": "square",
-					"label": "t:sections.main-search.settings.image_ratio.options__3.label"
-				}
-			],
-			"default": "adapt",
-			"label": "t:sections.main-search.settings.image_ratio.label"
-		},
-		{
-			"type": "select",
-			"id": "image_shape",
-			"options": [
-				{
-					"value": "default",
-					"label": "t:sections.all.image_shape.options__1.label"
-				},
-				{
-					"value": "arch",
-					"label": "t:sections.all.image_shape.options__2.label"
-				},
-				{
-					"value": "blob",
-					"label": "t:sections.all.image_shape.options__3.label"
-				},
-				{
-					"value": "chevronleft",
-					"label": "t:sections.all.image_shape.options__4.label"
-				},
-				{
-					"value": "chevronright",
-					"label": "t:sections.all.image_shape.options__5.label"
-				},
-				{
-					"value": "diamond",
-					"label": "t:sections.all.image_shape.options__6.label"
-				},
-				{
-					"value": "parallelogram",
-					"label": "t:sections.all.image_shape.options__7.label"
-				},
-				{
-					"value": "round",
-					"label": "t:sections.all.image_shape.options__8.label"
-				}
-			],
-			"default": "default",
-			"label": "t:sections.all.image_shape.label",
-			"info": "t:sections.all.image_shape.info"
-		},
-		{
-			"type": "checkbox",
-			"id": "show_secondary_image",
-			"default": false,
-			"label": "t:sections.main-search.settings.show_secondary_image.label"
-		},
-		{
-			"type": "checkbox",
-			"id": "show_vendor",
-			"default": false,
-			"label": "t:sections.main-search.settings.show_vendor.label"
-		},
-		{
-			"type": "checkbox",
-			"id": "show_rating",
-			"default": false,
-			"label": "t:sections.main-search.settings.show_rating.label",
-			"info": "t:sections.main-search.settings.show_rating.info"
-		},
-		{
-			"type": "header",
-			"content": "t:sections.main-collection-product-grid.settings.header__1.content"
-		},
-		{
-			"type": "checkbox",
-			"id": "enable_filtering",
-			"default": true,
-			"label": "t:sections.main-collection-product-grid.settings.enable_filtering.label",
-			"info": "t:sections.main-collection-product-grid.settings.enable_filtering.info"
-		},
-		{
-			"type": "select",
-			"id": "filter_type",
-			"options": [
-				{
-					"value": "horizontal",
-					"label": "t:sections.main-collection-product-grid.settings.filter_type.options__1.label"
-				},
-				{
-					"value": "vertical",
-					"label": "t:sections.main-collection-product-grid.settings.filter_type.options__2.label"
-				},
-				{
-					"value": "drawer",
-					"label": "t:sections.main-collection-product-grid.settings.filter_type.options__3.label"
-				}
-			],
-			"default": "horizontal",
-			"label": "t:sections.main-collection-product-grid.settings.filter_type.label",
-			"info": "t:sections.main-collection-product-grid.settings.filter_type.info"
-		},
-		{
-			"type": "checkbox",
-			"id": "enable_sorting",
-			"default": true,
-			"label": "t:sections.main-collection-product-grid.settings.enable_sorting.label"
-		},
-		{
-			"type": "header",
-			"content": "t:sections.main-search.settings.header__2.content",
-			"info": "t:sections.main-search.settings.header__2.info"
-		},
-		{
-			"type": "checkbox",
-			"id": "article_show_date",
-			"default": true,
-			"label": "t:sections.main-search.settings.article_show_date.label"
-		},
-		{
-			"type": "checkbox",
-			"id": "article_show_author",
-			"default": false,
-			"label": "t:sections.main-search.settings.article_show_author.label"
-		},
-{% endcomment %}
