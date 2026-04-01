@@ -58,15 +58,15 @@ function toggleResultsGrayedOut(turnToGray) {
   }
 }
 
-async function onPageLoad() {
+async function checkForAddressInUrl() {
   setGridSize();
 
   const params = new URLSearchParams(window.location.search);
 
   const address = params.get("address");
   if (address) {
-    const addressField = document.getElementById("addressField");
-    addressField.value = address;
+    const inputElement = getInputElement();
+    inputElement.value = address;
   }
   const lat = params.get("lat");
   const lon = params.get("lon");
@@ -82,7 +82,7 @@ async function onPageLoad() {
     });
   }
 }
-
-onPageLoad().then((value) => {
-  // console.log('onPageLoad');
-});
+//
+// onPageLoad().then((value) => {
+//   // console.log('onPageLoad');
+// });

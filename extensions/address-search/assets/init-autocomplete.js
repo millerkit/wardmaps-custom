@@ -1,212 +1,139 @@
 // this code adapted from
-// https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-addressform#maps_places_autocomplete_addressform-javascript
+// https://configure.mapsplatform.google/place-picker
 
-// let latField;
-// let lonField;
-// let localityField;
-// let stateField;
-let searchForm;
-let addressField;
 let lastValidatedAddress;
-let mainDiv;
-let autocompletePlace;
 
-async function getPlaceDetails(placesService, placeId, PlacesServiceStatus) {
-  return placesService.getDetails(
-    {
-      placeId: placeId,
-      fields: ["formatted_address", "address_components", "geometry"],
-    },
-    async (placeResult, status) => {
-      if (status === PlacesServiceStatus.OK && placeResult) {
-        // console.log(`got 1st place prediction handlePlaceChange with result=${placeResult.formatted_address}`)
-        await handlePlaceChange(placeResult);
-      }
-    },
-  );
+function getAddressFieldDiv() {
+  return document.getElementById("addressFieldDiv");
 }
 
-function tryGettingPlaceFromQuery(
-  placesService,
-  addressFieldValue,
-  PlacesServiceStatus,
-) {
-  // console.log(`calling findPlaceFromQuery with partial address=${addressFieldValue}`)
-  placesService.findPlaceFromQuery(
-    { query: addressFieldValue, fields: ["place_id"], locationBias: "IP_BIAS" },
-    (results, status) => {
-      if (status === PlacesServiceStatus.OK && results.length) {
-        const firstPlace = results[0];
-        getPlaceDetails(placesService, firstPlace, PlacesServiceStatus);
-      } else {
-        // no results. leave the bad address in the address field, show no results,
-        // and "post" bad address to the same page
-        setSearchResultsHeader(0);
-        simulateFormPost(addressFieldValue, "", "", "", "");
-      }
-    },
+function getGmpxPlacePickerElement() {
+  return document.querySelector("gmpx-place-picker");
+}
+
+function getGmpxContainerDiv(gmpxPlacePickerElement) {
+  const shadowRoot = gmpxPlacePickerElement.shadowRoot;
+  return shadowRoot.querySelector("div.container");
+}
+
+function getInputElement(gmpxPlacePickerElement) {
+  if (!gmpxPlacePickerElement) {
+    gmpxPlacePickerElement = getGmpxPlacePickerElement();
+  }
+
+  const shadowRoot = gmpxPlacePickerElement.shadowRoot;
+  return shadowRoot.querySelector("input.pac-target-input");
+}
+
+function setStyles() {
+  const gmpxPlacePickerElement = getGmpxPlacePickerElement();
+
+  // set styles on the root element
+  gmpxPlacePickerElement.style.setProperty("width", "100");
+  gmpxPlacePickerElement.style.setProperty("display", "flex");
+  gmpxPlacePickerElement.style.setProperty("flex-grow", "1");
+
+  // set styles on the container div
+  const containerDiv = getGmpxContainerDiv(gmpxPlacePickerElement);
+  containerDiv.style.setProperty("display", "flex");
+  containerDiv.style.setProperty("flex-grow", "1");
+  containerDiv.style.setProperty(
+    "font-family",
+    "var(--typeBasePrimary), serif",
   );
+
+  containerDiv.style.setProperty("font-style", "normal");
+  containerDiv.style.setProperty("font-weight", "var(--font-body-weight)");
+  containerDiv.style.setProperty(
+    "font-family",
+    "var(--typeBasePrimary), var(--typeBaseFallback)",
+  );
+  containerDiv.style.setProperty("font-size", "var(--typeBaseSize)");
+  containerDiv.style.setProperty("letter-spacing", "var(--typeBaseSpacing)");
+  containerDiv.style.setProperty("line-height", "var(--typeBaseLineHeight)");
+  containerDiv.style.setProperty("-webkit-font-smoothing", "antialiased");
+  containerDiv.style.setProperty("-webkit-text-size-adjust", "100%");
+  containerDiv.style.setProperty("text-rendering", "optimizeSpeed");
+
+  // set styles on the input element
+  const inputElement = getInputElement(gmpxPlacePickerElement);
+  inputElement.style.setProperty("display", "flex");
+  inputElement.style.setProperty("flex-grow", "1");
+  inputElement.style.setProperty("appearance", "none");
+  inputElement.style.setProperty(
+    "background-color",
+    "rgb(var(--color-background))",
+  );
+  inputElement.style.setProperty("color", "rgb(var(--color-foreground))");
+
+  inputElement.style.setProperty("border-radius", "var(--inputs-radius)");
+  inputElement.style.setProperty("box-sizing", "border-box");
+  inputElement.style.setProperty(
+    "transition",
+    "box-shadow var(--duration-short) ease",
+  );
+  inputElement.style.setProperty("height", "4.5rem");
+  inputElement.style.setProperty(
+    "min-height",
+    "calc(var(--inputs-border-width) * 2)",
+  );
+  inputElement.style.setProperty(
+    "min-width",
+    "calc(7rem + (var(--inputs-border-width) * 2))",
+  );
+  inputElement.style.setProperty("position", "relative");
+  inputElement.style.setProperty("border", "0");
+
+  inputElement.style.setProperty(
+    "padding-left",
+    "calc(var(--gmpx-font-size-base, 0.875rem)* 2.5",
+  );
+  inputElement.style.setProperty(
+    "padding-top",
+    "calc(var(--gmpx-font-size-base, 0.875rem)* 0.75)",
+  );
+  inputElement.style.setProperty(
+    "padding-bottom",
+    "calc(var(--gmpx-font-size-base, 0.875rem)* 0.75)",
+  );
+  inputElement.style.setProperty(
+    "padding-right",
+    "calc(var(--gmpx-font-size-base, 0.875rem)* 0.75)",
+  );
+
+  // now that we've set the styles, un-hide the whole div
+  const addressFieldDiv = getAddressFieldDiv();
+  addressFieldDiv.style.setProperty("display", "flex");
 }
 
 async function initAutocomplete() {
-  // latField = document.getElementById("lat");
-  // lonField = document.getElementById("lon");
-  // localityField = document.getElementById("locality");
-  // stateField = document.getElementById("state");
+  setStyles();
 
-  addressField = document.getElementById("addressField");
-  searchForm = document.getElementById("search-form");
-  mainDiv = document.getElementById("main-div");
+  const picker = document.querySelector("gmpx-place-picker");
+  picker.addEventListener("gmpx-placechange", async (e) => {
+    const place = e.target.value;
 
-  // Request needed libraries.
-  // eslint-disable-next-line no-undef
-  const {
-    Autocomplete,
-    PlacesService,
-    AutocompleteService,
-    PlacesServiceStatus,
-  } = await google.maps.importLibrary("places");
-
-  // construct a placesService object
-  const placesService = new PlacesService(document.getElementById("hiddenDiv"));
-
-  // construct a new AutocompleteService
-  const autocompleteService = new AutocompleteService();
-
-  // construct an autocomplete object
-  // Create the autocomplete object, restricting the search predictions to
-  // addresses in the US and Canada.
-  const autocomplete = new Autocomplete(addressField, {
-    componentRestrictions: { country: ["us", "ca"] },
-    fields: ["formatted_address", "address_components", "geometry"],
-    types: ["address"],
-  });
-  addressField.focus();
-
-  // When the user selects an address from the drop-down, populate the
-  // address fields in the form.
-  autocomplete.addListener("place_changed", async () => {
-    autocompletePlace = autocomplete.getPlace();
-    if (autocompletePlaceHasChanged()) {
-      await handlePlaceChange(autocompletePlace);
-    }
-  });
-
-  // if the user submits the form (i.e., hits return) before selecting an autocomplete suggestion,
-  // then select the first place in the autocomplete list
-  searchForm.onsubmit = async () => {
-    const addressFieldValue = addressField.value
-      ? addressField.value.trim()
-      : null;
-    // console.log(`searchForm.onsubmit addressFieldValue = ${addressFieldValue}`)
-    if (addressFieldPlaceHasChanged(addressFieldValue)) {
-      // addressField has something, but the value doesn't match the last google validated address (or there is no last validated address)
-
-      // if we have an autocomplete result from the last search, use that
-
-      autocompleteService.getPlacePredictions(
-        { input: addressFieldValue, locationBias: "IP_BIAS" },
-        async (results, status) => {
-          if (status === PlacesServiceStatus.OK && results.length) {
-            // console.log(`Got a prediction.`)
-            await getPlaceDetails(
-              placesService,
-              results[0].place_id,
-              PlacesServiceStatus,
-            );
-          }
-        },
+    // handle a new place selection
+    if (place.formattedAddress && place.location && place.addressComponents) {
+      if (place.formattedAddress !== lastValidatedAddress) {
+        lastValidatedAddress = place.formattedAddress;
+        await handlePlaceChange(
+          place.formattedAddress,
+          place.location,
+          place.addressComponents,
+        );
+      }
+    } else {
+      console.error(
+        "Could not get formattedAddress, location, and addressComponents from the place.",
       );
-
-      // } else {
-      // 	// run a query and return the 1st result
-      // 	tryGettingPlaceFromQuery(placesService, addressFieldValue, PlacesServiceStatus);
-      // }
-      return false;
     }
-  };
+  });
+
+  // Handle a page load (i.e. see if the url has an address parameter that we need to show results for).
+  // We have to put this code here instead of the actual onPageLoad event because we need to wait for the Google
+  // autocomplete widget to be initialized above.
+  await checkForAddressInUrl();
 }
 
-function autocompletePlaceHasChanged() {
-  const address = autocompletePlace ? autocompletePlace.formatted_address : "";
-  if (address && address !== lastValidatedAddress) {
-    // console.log("----------------------")
-    // console.log(`autocompletePlaceHasChanged: address=${address}, lastValidatedAddress=${lastValidatedAddress}`)
-    // console.log(`handlePlaceChange with result=${address}`)
-    return true;
-  }
-
-  return false;
-}
-
-function addressFieldPlaceHasChanged(newAddress) {
-  if (newAddress && newAddress !== lastValidatedAddress) {
-    // console.log("----------------------")
-    // console.log(`addressFieldPlaceHasChanged: newAddress=${newAddress}, lastValidatedAddress=${lastValidatedAddress}`)
-    return true;
-  }
-  return false;
-}
-
-function simulateFormPost(address, lat, lon, locality, state) {
-  const url = new URL(window.location.href);
-  url.searchParams.set("address", address);
-  url.searchParams.set("lat", lat);
-  url.searchParams.set("lon", lon);
-  url.searchParams.set("locality", locality);
-  url.searchParams.set("state", state);
-  window.history.pushState(null, "", url.toString());
-}
-
-function getAddressComponents(newPlace) {
-  return newPlace.address_components.reduce(
-    (acc, curr) => (
-      (acc[curr.types[0]] = {
-        long_name: curr.long_name,
-        short_name: curr.short_name,
-      }),
-      acc
-    ),
-    {},
-  );
-}
-
-async function handlePlaceChange(newPlace) {
-  // the autocomplete result should always give us formatted_address, geometry, and address_components,
-  // but I'm not 100% sure of that.
-  if (
-    newPlace.formatted_address &&
-    newPlace.geometry &&
-    newPlace.address_components
-  ) {
-    const newAddress = newPlace.formatted_address;
-    lastValidatedAddress = newAddress;
-    // console.log(`set lastValidatedAddress to ${lastValidatedAddress}`)
-
-    // set the formatted address to the value from autocomplete
-    // console.log(`set addressField.value to ${newAddress}`)
-    addressField.value = newAddress;
-
-    // get the lat and lon
-    const lat = newPlace.geometry.location.lat();
-    const lon = newPlace.geometry.location.lng();
-
-    // set city and state
-    const addressComponents = getAddressComponents(newPlace);
-    const locality = addressComponents.locality.long_name;
-    const state = addressComponents.administrative_area_level_1.short_name;
-
-    // "post" the form to the current page
-    simulateFormPost(newAddress, lat, lon, locality, state);
-
-    // and perform the search
-    showLoading();
-    await performSearch(lat, lon, locality, state).finally((value) => {
-      hideLoading();
-    });
-  }
-}
-
-initAutocomplete().then((value) => {
-  // console.log('initAutocomplete');
-});
+window.addEventListener("load", initAutocomplete);

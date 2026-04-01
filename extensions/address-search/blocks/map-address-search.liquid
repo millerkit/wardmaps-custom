@@ -38,31 +38,14 @@
     </symbol>
 </svg>
 
-<script>
-	(g => {
-		let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary",
-				q = "__ib__", m = document, b = window;
-		b = b[c] || (b[c] = {});
-		const d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
-				u = () => h || (h = new Promise(async (f, n) => {
-					await (a = m.createElement("script"));
-					e.set("libraries", [...r] + "");
-					for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-					e.set("callback", c + ".maps." + q);
-					a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-					d[q] = f;
-					a.onerror = () => h = n(Error(p + " could not load."));
-					a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-					m.head.append(a)
-				}));
-		d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
-	})({
-		key: "AIzaSyCIWmSnAXVG4i7bgSnrT8ToScJltp4ar5w",
-		v: "weekly",
-		// Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
-		// Add other bootstrap parameters as needed, using camel case.
-	});
-</script>
+<!-- prettier-ignore -->
+<!-- See https://github.com/googlemaps/extended-component-library for docs and updates. -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/@googlemaps/extended-component-library/0.6.11/index.min.js"></script>
+{% comment %}<script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))}){% endcomment %}
+	{% comment %}({key: "AIzaSyDV6nh-_iS6xeI6dvkEqD7OJ6Fztt5tkGI", v: "beta"});{% endcomment %}
+{% comment %}</script>{% endcomment %}
+<script src="{{ 'handle-place-change.js' | asset_url }}" async></script>
+<script src="{{ 'check-for-address-in-url.js' | asset_url }}" async></script>
 <script src="{{ 'init-autocomplete.js' | asset_url }}" async></script>
 
 <div class="template-search section-{{ block.id }}-padding" id="main-div">
@@ -71,17 +54,19 @@
             <address-search-form>
                 <form role="search" class="search" id="search-form">
                     <div class="field" id="hiddenDiv" style="display: none"></div>
-                    <div class="field" id="addressFieldDiv">
-                        <input
-                                class="search__input field__input"
-                                id="addressField"
-                                type="search"
-                                name="address"
-                                value=""
-                                placeholder="{{ 'address-search.form.placeholder' | t }}"
-                        >
-                        <label class="field__label"
-                               for="addressField">{{ 'address-search.form.address_label' | t }}</label>
+                    <div class="field" id="addressFieldDiv" style="display: none;">
+						<gmpx-api-loader key="AIzaSyDV6nh-_iS6xeI6dvkEqD7OJ6Fztt5tkGI" solution-channel="GMP_GCC_placepicker_v1"></gmpx-api-loader>
+						<div class="field placePickerContainer" id="placePickerContainer">
+							<gmpx-place-picker placeholder="{{ 'address-search.form.address_label' | t }}"></gmpx-place-picker>
+						</div>
+						{% comment %}<input{% endcomment %}
+								{% comment %}class="search__input field__input"{% endcomment %}
+								{% comment %}id="addressField"{% endcomment %}
+								{% comment %}type="search"{% endcomment %}
+								{% comment %}name="address"{% endcomment %}
+						{% comment %}>{% endcomment %}
+                        {% comment %}<label class="field__label"{% endcomment %}
+                               {% comment %}for="addressField">{{ 'address-search.form.address_label' | t }}</label>{% endcomment %}
 
                         <input type="hidden" name="locality" id="locality" value="">
                         <input type="hidden" name="state" id="state" value="">
@@ -95,21 +80,21 @@
 							</svg>
 						</span>
 
-                        <button
-                                type="reset"
-                                class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"
-                                aria-label="{{ 'general.search.reset' | t }}"
-                        >
-                            <svg class="icon icon-close" aria-hidden="true" focusable="false">
-                                <use xlink:href="#icon-reset"/>
-                            </svg>
-                        </button>
-                        <button type="submit" class="search__button field__button"
-                                aria-label="{{ 'general.search.search' | t }}">
-                            <svg class="icon icon-search" aria-hidden="true" focusable="false">
-                                <use xlink:href="#icon-search"/>
-                            </svg>
-                        </button>
+                        {% comment %}<button{% endcomment %}
+                                {% comment %}type="reset"{% endcomment %}
+                                {% comment %}class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"{% endcomment %}
+                                {% comment %}aria-label="{{ 'general.search.reset' | t }}"{% endcomment %}
+                        {% comment %}>{% endcomment %}
+                            {% comment %}<svg class="icon icon-close" aria-hidden="true" focusable="false">{% endcomment %}
+                                {% comment %}<use xlink:href="#icon-reset"/>{% endcomment %}
+                            {% comment %}</svg>{% endcomment %}
+                        {% comment %}</button>{% endcomment %}
+                        {% comment %}<button type="submit" class="search__button field__button"{% endcomment %}
+                                {% comment %}aria-label="{{ 'general.search.search' | t }}">{% endcomment %}
+                            {% comment %}<svg class="icon icon-search" aria-hidden="true" focusable="false">{% endcomment %}
+                                {% comment %}<use xlink:href="#icon-search"/>{% endcomment %}
+                            {% comment %}</svg>{% endcomment %}
+                        {% comment %}</button>{% endcomment %}
                     </div>
                 </form>
             </address-search-form>
