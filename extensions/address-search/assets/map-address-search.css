@@ -59,7 +59,7 @@
     --p-motion-duration-500: 500ms;
     --pageMinHeight: 300px;
     --pageNarrow: 700px;
-    --pageTopPadding: 35px;
+    --pageTopPadding: 20px;
     --pageWidthPadding: 40px;
     --productTileMargin: 2%;
     --roundness: 15px;
@@ -86,8 +86,9 @@ html {
     font-size: 15px;
 }
 
-form.search {
-    min-height: 300px;
+/* important override */
+#MainContent {
+    --page-width: 100%;
 }
 
 .field {
@@ -542,7 +543,7 @@ input::-webkit-search-decoration {
         }
     }
     .section-header {
-        margin-bottom: 0;
+        margin-bottom: 16px;
     }
 
     .section-header__title {
@@ -559,7 +560,7 @@ input::-webkit-search-decoration {
 
 @media screen and (min-width: 750px) {
     .section-header__title {
-        padding-left: 2.5rem;
+        padding-left: 1rem;
     }
 }
 
