@@ -52,7 +52,17 @@
                 <form role="search" class="search" id="search-form">
                     <div class="field" id="hiddenDiv" style="display: none"></div>
                     <div class="field" id="addressFieldDiv" style="display: none;">
-						<gmpx-api-loader key="AIzaSyDV6nh-_iS6xeI6dvkEqD7OJ6Fztt5tkGI" solution-channel="GMP_GCC_placepicker_v1"></gmpx-api-loader>
+						{% if block.settings.google_maps_api_key != blank %}
+							<gmpx-api-loader
+									key="{{ block.settings.google_maps_api_key }}"
+									solution-channel="GMP_GCC_placepicker_v1">
+							</gmpx-api-loader>
+						{% else %}
+							<p style="color: red;">
+								Google Maps is not configured. Please add your API key in the theme editor.
+							</p>
+						{% endif %}
+
 						<div class="field placePickerContainer" id="placePickerContainer">
 							<gmpx-place-picker placeholder="{{ 'address-search.form.address_label' | t }}"></gmpx-place-picker>
 						</div>
@@ -95,6 +105,11 @@
 	"target": "section",
 	"stylesheet": "map-address-search.css",
 	"settings": [
+		{
+			"type": "text",
+			"id": "google_maps_api_key",
+			"label": "Google Maps API Key"
+		},
 		{
 			"type": "range",
 			"id": "columns_desktop",
